@@ -82,20 +82,38 @@ export default function App() {
   };
 
   const skipToNext = () => {
-
-  }
+    songSlider.current.scrollToOffset({
+      offset: (songIndex + 1) * width 
+    })
+  };
 
   const skipToPrevious = () => {
-
-  }
+    songSlider.current.scrollToOffset({
+      offset: (songIndex - 1) * width 
+  })
+  };
 
   const stop = async () => {
-
+    if (sound) {
+      await sound.stopAsync();
+      sound.unloadAsync();
+      await loadSound();
+    }
   }
 
   const repeat = async (value) => {
-
+    setIsLooping(value);
+    await sound.setIsLoopingAsync(value);
   }
+
+  const updatePosition = async () => {
+    
+  }
+
+  useEffect (() => {
+    const intervalid = setInterval(updatePosition, 500);
+    return () => clearInterval(intervalid);
+  }, [sound, isPlaying])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -129,9 +147,9 @@ export default function App() {
       <View>
         <Slider 
           style={styles.progressBar}
-          value={10}
+          value={songStatus ? songStatus.positionMillis : 0}
           minimumValue={0}
-          maximumValue={100}
+          maximumValue={songStatus ? songStatus.durationMillis : 0}
           thumbTintColor='#FFD369'
           minimumTrackTintColor='#FFD369'
           maximumTrackTintColor='#fff'
